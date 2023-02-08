@@ -15,6 +15,11 @@ const mapInputDataKeysToAPI = (data) => {
 
 const perform = async (z, bundle) => {
   const body = mapInputDataKeysToAPI(bundle.inputData);
+
+  // Move the document `body` key to its rightful place for the API.
+  body.documents = [{ body: body.body }];
+  delete body.body;
+
   const response = await z.request({
     method: "POST",
     url: "https://api.staging.getmagistrate.com/v1/envelopes/",
@@ -44,19 +49,12 @@ module.exports = {
           "The name of the envelope. Limited to 254 characters that are alphanumeric, spaces, numbers, or symbols.",
       },
       {
-        key: "documents",
-        label: "Documents",
+        key: "body",
+        type: "text",
+        label: "Body",
         required: true,
-        children: [
-          {
-            key: "documents.body",
-            type: "text",
-            label: "Body",
-            required: true,
-            helpText:
-              "This is the body (text) of the contract. It should not include any signature blocks.",
-          },
-        ],
+        helpText:
+          "This is the body (text) of the contract. It should not include any signature blocks.",
       },
       {
         key: "parties",
@@ -114,7 +112,7 @@ module.exports = {
 
     sample: {
       name: "Test Envelope",
-      documents: [{ "documents.body": "Test Body" }],
+      body: "Test Body",
       parties: [
         {
           "parties.name": "Party A",
