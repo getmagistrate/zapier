@@ -1,14 +1,15 @@
+const createEnvelope = require("./creates/envelope");
 const authentication = {
-  type: 'custom',
+  type: "custom",
   test: {
-    url: 'https://api.staging.getmagistrate.com/v1/me/',
+    url: "https://api.staging.getmagistrate.com/v1/me/",
   },
   fields: [
     {
-      key: 'api_key',
-      type: 'string',
+      key: "apiKey",
+      type: "string",
       required: true,
-      helpText: 'Found on your settings page.',
+      helpText: "Found on your settings page.",
     },
   ],
 };
@@ -18,12 +19,11 @@ const addApiKeyToHeader = (request, z, bundle) => {
   return request;
 };
 
-
 module.exports = {
   // This is just shorthand to reference the installed dependencies you have.
   // Zapier will need to know these before we can upload.
-  version: require('./package.json').version,
-  platformVersion: require('zapier-platform-core').version,
+  version: require("./package.json").version,
+  platformVersion: require("zapier-platform-core").version,
   authentication,
   beforeRequest: [addApiKeyToHeader],
 
@@ -34,7 +34,9 @@ module.exports = {
   searches: {},
 
   // If you want your creates to show up, you better include it here!
-  creates: {},
+  creates: {
+    [createEnvelope.key]: createEnvelope,
+  },
 
   resources: {},
 };
