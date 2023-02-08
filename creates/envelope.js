@@ -25,8 +25,6 @@ const perform = async (z, bundle) => {
 };
 
 module.exports = {
-  // see here for a full list of available properties:
-  // https://github.com/zapier/zapier-platform/blob/main/packages/schema/docs/build/schema.md#createschema
   key: "envelope",
   noun: "Envelope",
 
@@ -38,10 +36,6 @@ module.exports = {
 
   operation: {
     perform,
-
-    // `inputFields` defines the fields a user could provide
-    // Zapier will pass them in as `bundle.inputData` later. They're optional.
-    // End-users will map data into these fields. In general, they should have any fields that the API can accept. Be sure to accurately mark which fields are required!
     inputFields: [
       {
         key: "name",
@@ -68,51 +62,72 @@ module.exports = {
         key: "parties",
         label: "Parties",
         required: true,
-        list: true,
         children: [
           {
             key: "parties.name",
             label: "Name",
             type: "string",
             required: true,
+            helpText:
+              'The legal name of the party. For example, "Magistrate Inc." if the party is an entity. Or "Harry Khanna" if the party is a human being. Limited to 80 characters.',
           },
           {
             key: "parties.email",
             label: "Email",
             type: "string",
             required: true,
+            helpText:
+              "The email address of the party. If the party is an entity like a corporation, this should be the email address of the authorized signatory. Limited to 254 characters.",
           },
           {
             key: "parties.is_entity",
             type: "boolean",
             required: true,
+            helpText:
+              "If the party to the contract is an entity like a corporation, this should be true. If the party is a human being, this should be false.",
           },
         ],
+      },
+      {
+        key: "autosign",
+        label: "Autosign",
+        type: "boolean",
+        helpText:
+          "If autosign is true, any signatures belonging to the creator of the envelope will be signed automatically. The creator will not receive an email soliciting their signature since they will have already signed.\n\nThis is ignored if the action is `draft`. This is also ignored if the creator of the envelope is not also a signatory.",
+      },
+      {
+        key: "suppress_emails",
+        label: "Suppress Emails",
+        choices: ["creator"],
+        helpText:
+          "If provided, it must be the string `creator`. If this is provided, the creator of the envelope will not receive any emails related to the envelope.",
       },
       {
         key: "action",
         label: "Action",
         choices: ["draft", "send"],
         required: true,
+        helpText:
+          "`send` will generate an envelope and send it for signature to all parties in one step. **Caution**: This will `draft` will generate an envelope and save it as a draft. To make any edits or send it for signature, you must log into the web user interface.",
       },
     ],
 
-    // In cases where Zapier needs to show an example record to the user, but we are unable to get a live example
-    // from the API, Zapier will fallback to this hard-coded sample. It should reflect the data structure of
-    // returned records, and have obvious placeholder values that we can show to any user.
     sample: {
-      id: 1,
-      name: "Test",
+      name: "Test Envelope",
+      documents: [{ "documents.body": "Test Body" }],
+      parties: [
+        {
+          "parties.name": "Party A",
+          "parties.email": "partyA@example.com",
+          "parties.is_entity": false,
+        },
+        {
+          "parties.name": "Party B",
+          "parties.email": "partyB@example.com",
+          "parties.is_entity": false,
+        },
+      ],
+      action: "draft",
     },
-
-    // If fields are custom to each user (like spreadsheet columns), `outputFields` can create human labels
-    // For a more complete example of using dynamic fields see
-    // https://github.com/zapier/zapier-platform/tree/main/packages/cli#customdynamic-fields
-    // Alternatively, a static field definition can be provided, to specify labels for the fields
-    outputFields: [
-      // these are placeholders to match the example `perform` above
-      // {key: 'id', label: 'Person ID'},
-      // {key: 'name', label: 'Person Name'}
-    ],
   },
 };

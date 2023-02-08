@@ -2,6 +2,7 @@
 
 const zapier = require("zapier-platform-core");
 const App = require("../../index");
+const createEnvelope = require("../../creates/envelope");
 const appTester = zapier.createAppTester(App);
 zapier.tools.env.inject();
 
@@ -11,23 +12,7 @@ describe("creates.envelope", () => {
       authData: {
         apiKey: process.env.API_KEY,
       },
-      inputData: {
-        name: "Test Envelope",
-        documents: [{ "documents.body": "Test Body" }],
-        parties: [
-          {
-            "parties.name": "Party A",
-            "parties.email": "partyA@example.com",
-            "parties.is_entity": false,
-          },
-          {
-            "parties.name": "Party B",
-            "parties.email": "partyB@example.com",
-            "parties.is_entity": false,
-          },
-        ],
-        action: "draft",
-      },
+      inputData: createEnvelope.operation.sample,
     };
 
     const results = await appTester(
