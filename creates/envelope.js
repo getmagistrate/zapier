@@ -1,20 +1,28 @@
-const mapInputDataKeysToAPI = (data) => {
-  if (data instanceof Array) {
-    return data.map(mapInputDataKeysToAPI);
-  } else if (data instanceof Object) {
-    const newObj = {};
-    Object.keys(data).forEach((key) => {
-      const newKey = key.split(".").slice(-1);
-      newObj[newKey] = mapInputDataKeysToAPI(data[key]);
-    });
-    return newObj;
-  } else {
-    return data;
+const unflatten = (obj, skipFirstKey) => {
+  // Given the flat nature of Zapier keys, turn it into
+  // a nested object Magistrate's API consumes.
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const keys = key.split(".");
+    let nested = result;
+    const start = skipFirstKey ? 1 : 0;
+    for (let i = start; i < keys.length - 1; i++) {
+      const k = keys[i];
+      nested[k] = nested[k] || {};
+      nested = nested[k];
+    }
+    const lastKey = keys[keys.length - 1];
+    if (Array.isArray(value)) {
+      nested[lastKey] = value.map((item) => unflatten(item, true));
+    } else {
+      nested[lastKey] = value;
+    }
   }
+  return result;
 };
 
 const perform = async (z, bundle) => {
-  const body = mapInputDataKeysToAPI(bundle.inputData);
+  const body = unflatten(bundle.inputData);
 
   // Move the document `body` key to its rightful place for the API.
   body.documents = [{ body: body.body }];
@@ -79,10 +87,23 @@ module.exports = {
           },
           {
             key: "parties.is_entity",
+            label: "Is the party an entity?",
             type: "boolean",
             required: true,
             helpText:
               "If the party to the contract is an entity like a corporation, this should be true. If the party is a human being, this should be false.",
+          },
+          {
+            key: "parties.authorized_human.name",
+            label: "Signatory's Name (Entities Only)",
+            helpText:
+              "The name of the human that is authorized to sign for the entity. **Required** if `is_entity` is true. **Ignored** if `is_entity` is false.",
+          },
+          {
+            key: "parties.authorized_human.title",
+            label: "Signatory's Title (Entities Only)",
+            helpText:
+              "The title of the human that is authorized to sign for the entity. **Ignored** if `is_entity` is false.",
           },
         ],
       },
@@ -122,7 +143,9 @@ module.exports = {
         {
           "parties.name": "Party B",
           "parties.email": "partyB@example.com",
-          "parties.is_entity": false,
+          "parties.is_entity": true,
+          "parties.authorized_human.name": "Jane Doe",
+          "parties.authorized_human.title": "President",
         },
       ],
       action: "draft",
