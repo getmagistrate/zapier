@@ -19,6 +19,12 @@ describe("creates.envelope", () => {
       App.creates.envelope.operation.perform,
       bundle
     );
+    expect(results).toBeDefined();
     expect(results).toHaveProperty("id");
+    expect(results).toHaveProperty("name");
+    expect(results).toHaveProperty("status");
+    expect(results).toHaveProperty("source");
+    expect(results["source"]).toEqual("zapier");
+
   });
 });
