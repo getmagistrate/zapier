@@ -12,7 +12,7 @@ const authentication = {
       type: "string",
       required: true,
       helpText:
-        "Found on your [settings page](https://secure.getmagistrate.com/accounts/settings/).",
+        "Found on your [integrations page](https://secure.getmagistrate.com/sign/integrations/).",
     },
   ],
 };
