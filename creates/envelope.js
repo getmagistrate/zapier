@@ -108,6 +108,13 @@ module.exports = {
         ],
       },
       {
+        key: "webhook_url",
+        label: "Webhook URL",
+        type: "string",
+        helpText:
+          "The URL where Magistrate will `POST` webhooks related to this envelope. If this is provided, the API will immediately `POST` a webhook of type `webhook_url_verification` to the endpoint, and if it does not return a `2xx` response within a couple seconds, the whole API call fail with a `400` response.",
+      },
+      {
         key: "autosign",
         label: "Autosign",
         type: "boolean",
@@ -127,7 +134,7 @@ module.exports = {
         choices: ["draft", "send"],
         required: true,
         helpText:
-          "`send` will generate an envelope and send it for signature to all parties in one step. **Caution**: This will `draft` will generate an envelope and save it as a draft. To make any edits or send it for signature, you must log into the web user interface.",
+          "`send` will generate an envelope and send it for signature to all parties in one step. **Caution**: Using `send` will immediately email all parties to the contract. `draft` will generate an envelope and save it as a draft. To make any edits or send it for signature, you must log into the web user interface.",
       },
     ],
 
