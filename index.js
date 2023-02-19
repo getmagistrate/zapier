@@ -1,4 +1,5 @@
 const createEnvelope = require("./creates/envelope");
+const getEnvelope = require("./searches/envelope");
 const authentication = {
   type: "custom",
   test: {
@@ -31,7 +32,9 @@ module.exports = {
   triggers: {},
 
   // If you want your searches to show up, you better include it here!
-  searches: {},
+  searches: {
+    [getEnvelope.key]: getEnvelope,
+  },
 
   // If you want your creates to show up, you better include it here!
   creates: {
