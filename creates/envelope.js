@@ -30,7 +30,7 @@ const perform = async (z, bundle) => {
 
   const response = await z.request({
     method: "POST",
-    url: "https://api.staging.getmagistrate.com/v1/envelopes/",
+    url: "{{process.env.API_DOMAIN}}/v1/envelopes/" + bundle.inputData.id + "/",
     body,
   });
   // this should return a single object

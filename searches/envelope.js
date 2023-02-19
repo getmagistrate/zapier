@@ -1,10 +1,7 @@
 // find a particular envelope by name
 const perform = async (z, bundle) => {
   const response = await z.request({
-    url:
-      "https://api.staging.getmagistrate.com/v1/envelopes/" +
-      bundle.inputData.id +
-      "/",
+    url: "{{process.env.API_DOMAIN}}/v1/envelopes/" + bundle.inputData.id + "/",
     skipThrowForStatus: true,
   });
   if (response.status === 404) {

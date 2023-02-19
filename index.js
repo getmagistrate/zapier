@@ -3,7 +3,7 @@ const getEnvelope = require("./searches/envelope");
 const authentication = {
   type: "custom",
   test: {
-    url: "https://api.staging.getmagistrate.com/v1/me/",
+    url: "{{process.env.API_DOMAIN}}/v1/me/",
   },
   fields: [
     {

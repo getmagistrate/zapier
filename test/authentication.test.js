@@ -4,10 +4,10 @@ const zapier = require('zapier-platform-core');
 
 const App = require('../index');
 const appTester = zapier.createAppTester(App);
+zapier.tools.env.inject();
 
 describe('custom auth', () => {
-  it('passes authentication and returns json', async () => {
-    zapier.tools.env.inject()
+  it("passes authentication and returns json", async () => {
     const bundle = {
       authData: {
         apiKey: process.env.API_KEY,
@@ -15,9 +15,9 @@ describe('custom auth', () => {
     };
 
     const response = await appTester(App.authentication.test, bundle);
-    expect(response).toHaveProperty('uuid');
-    expect(response).toHaveProperty('name');
-    expect(response).toHaveProperty('email');
+    expect(response).toHaveProperty("uuid");
+    expect(response).toHaveProperty("name");
+    expect(response).toHaveProperty("email");
   });
 
   it('fails on bad auth', async () => {
