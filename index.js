@@ -5,12 +5,14 @@ const authentication = {
   test: {
     url: "{{process.env.API_DOMAIN}}/v1/me/",
   },
+  connectionLabel: "{{email}}",
   fields: [
     {
       key: "apiKey",
       type: "string",
       required: true,
-      helpText: "Found on your settings page.",
+      helpText:
+        "Found on your [settings page](https://secure.getmagistrate.com/accounts/settings/).",
     },
   ],
 };
