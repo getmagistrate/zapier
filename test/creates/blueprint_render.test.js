@@ -51,7 +51,7 @@ describe("creates.blueprint_render", () => {
     const bundle = { inputData: { slug: "official/safe" } };
 
     const results = await appTester(
-      App.creates.blueprint_render.operation.inputFields[2],
+      App.creates.blueprint_render.operation.inputFields[3],
       bundle
     );
 
@@ -64,7 +64,7 @@ describe("creates.blueprint_render", () => {
     const bundle = { inputData: { slug: "aescher/boat-sharing-agreement" } };
 
     const results = await appTester(
-      App.creates.blueprint_render.operation.inputFields[2],
+      App.creates.blueprint_render.operation.inputFields[3],
       bundle
     );
 

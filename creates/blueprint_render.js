@@ -1,14 +1,15 @@
 const commonInputFields = require("./commonInputFields");
 
-// create a particular blueprintrender by name
 const perform = async (z, bundle) => {
   const response = await z.request({
     method: "POST",
-    url: "https://jsonplaceholder.typicode.com/posts",
-    // if `body` is an object, it'll automatically get run through JSON.stringify
-    // if you don't want to send JSON, pass a string in your chosen format here instead
+    url:
+      "{{process.env.API_DOMAIN}}/v1/envelopes/blueprint/" +
+      bundle.inputData.slug +
+      "/",
+
     body: {
-      name: bundle.inputData.name,
+      name: bundle.inputData.name, // FIXME
     },
   });
   // this should return a single object
@@ -49,6 +50,27 @@ const partiesField = async (z, bundle) => {
   return [];
 };
 
+const contextField = async (z, bundle) => {
+  // FIXME
+  const response = await z.request({
+    url:
+      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+  });
+
+  if (bundle.inputData.slug === "official/safe") {
+    return [
+      {
+        key: "field_1",
+      },
+      {
+        key: "field_2",
+      },
+    ];
+  } else {
+    return [];
+  }
+};
+
 module.exports = {
   key: "blueprint_render",
   noun: "blueprintrender",
@@ -64,6 +86,7 @@ module.exports = {
     inputFields: [
       blueprintSlugField,
       commonInputFields.name,
+      contextField,
       partiesField,
       commonInputFields.webhook_url,
       commonInputFields.autosign,
