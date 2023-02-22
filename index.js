@@ -1,5 +1,6 @@
 const createEnvelope = require("./creates/envelope");
 const getEnvelope = require("./searches/envelope");
+const createBlueprintRender = require("./creates/blueprint_render");
 const authentication = {
   type: "custom",
   test: {
@@ -41,6 +42,7 @@ module.exports = {
   // If you want your creates to show up, you better include it here!
   creates: {
     [createEnvelope.key]: createEnvelope,
+    [createBlueprintRender.key]: createBlueprintRender
   },
 
   resources: {},
