@@ -19,7 +19,9 @@ const authentication = {
 };
 
 const addApiKeyToHeader = (request, z, bundle) => {
+  if (bundle.authData.apiKey) {
   request.headers.Authorization = `Token ${bundle.authData.apiKey}`;
+  }
   return request;
 };
 

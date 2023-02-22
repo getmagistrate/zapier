@@ -19,19 +19,37 @@ const blueprintSlugField = async (z, bundle) => {
   const response = await z.request(
     "{{process.env.API_DOMAIN}}/v1/blueprints/official/"
   );
+  const data = JSON.parse(response.content);
+
   return [
     {
       key: "slug",
       label: "Blueprint",
       required: true,
-      choices: response.data,
+      choices: data,
+      altersDynamicFields: true,
     },
   ];
 };
 
+const partiesField = async (z, bundle) => {
+  if (!bundle.inputData.slug) {
+    return [];
+  }
+
+  const response = await z.request({
+    url:
+      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+  });
+
+  if (response.data.separate_parties) {
+    return [commonInputFields.parties];
+  }
+
+  return [];
+};
+
 module.exports = {
-  // see here for a full list of available properties:
-  // https://github.com/zapier/zapier-platform/blob/main/packages/schema/docs/build/schema.md#createschema
   key: "blueprint_render",
   noun: "blueprintrender",
 
@@ -43,21 +61,16 @@ module.exports = {
   operation: {
     perform,
 
-    // `inputFields` defines the fields a user could provide
-    // Zapier will pass them in as `bundle.inputData` later. They're optional.
-    // End-users will map data into these fields. In general, they should have any fields that the API can accept. Be sure to accurately mark which fields are required!
     inputFields: [
       blueprintSlugField,
       commonInputFields.name,
+      partiesField,
       commonInputFields.webhook_url,
       commonInputFields.autosign,
       commonInputFields.suppress_emails,
       commonInputFields.action,
     ],
 
-    // In cases where Zapier needs to show an example record to the user, but we are unable to get a live example
-    // from the API, Zapier will fallback to this hard-coded sample. It should reflect the data structure of
-    // returned records, and have obvious placeholder values that we can show to any user.
     sample: {
       slug: "official/safe",
       name: "Simple Agreement for Future Equity (SAFE)",

@@ -47,4 +47,30 @@ describe("creates.blueprint_render", () => {
     expect(results[0].choices).toContain("official/safe");
   });
 
+  it("should generate the partiesField with no separate parties", async () => {
+    const bundle = { inputData: { slug: "official/safe" } };
+
+    const results = await appTester(
+      App.creates.blueprint_render.operation.inputFields[2],
+      bundle
+    );
+
+    expect(results).toBeDefined();
+    expect(results).toHaveLength(0);
+  });
+
+  it.skip("should generate the partiesField with separate parties", async () => {
+    // Skipping until we have an official blueprint w/ separate parties
+    const bundle = { inputData: { slug: "aescher/boat-sharing-agreement" } };
+
+    const results = await appTester(
+      App.creates.blueprint_render.operation.inputFields[2],
+      bundle
+    );
+
+    expect(results).toBeDefined();
+    expect(results).toHaveLength(1);
+    expect(results[0]).toHaveProperty("key");
+  });
+
 });
