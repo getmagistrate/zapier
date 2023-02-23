@@ -50,25 +50,24 @@ const partiesField = async (z, bundle) => {
   return [];
 };
 
+const flattenFromContext = (context) => {
+  // Given a schema of the shape that comes from the Magistrate API,
+  // flatten it into Zapier inputFields.
+  return [];
+};
+
 const contextField = async (z, bundle) => {
+  if (!bundle.inputData.slug) {
+    return [];
+  }
+
   // FIXME
   const response = await z.request({
     url:
       "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
   });
-
-  if (bundle.inputData.slug === "official/safe") {
-    return [
-      {
-        key: "field_1",
-      },
-      {
-        key: "field_2",
-      },
-    ];
-  } else {
-    return [];
-  }
+  const context = flattenFromContext(response.context);
+  return context;
 };
 
 module.exports = {
