@@ -16,10 +16,33 @@ const perform = async (z, bundle) => {
   return response.data;
 };
 
+
+const errorField = (response, key, preface = "") => {
+  if (response.data.detail) {
+    return [
+      {
+        key,
+        type: "copy",
+        helpText: preface + response.data.detail,
+      },
+    ];
+  }
+};
+
 const blueprintSlugField = async (z, bundle) => {
-  const response = await z.request(
-    "{{process.env.API_DOMAIN}}/v1/blueprints/official/"
-  );
+  const response = await z.request({
+    url: "{{process.env.API_DOMAIN}}/v1/blueprints/official/",
+    skipThrowForStatus: true,
+  });
+
+  if (response.status >= 400) {
+    return errorField(
+      response,
+      "slug",
+      "There was a problem while obtaining the list of blueprints: "
+    );
+  }
+
   const data = JSON.parse(response.content);
 
   return [
@@ -41,7 +64,16 @@ const partiesField = async (z, bundle) => {
   const response = await z.request({
     url:
       "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+    skipThrowForStatus: true,
   });
+
+  if (response.status >= 400) {
+    return errorField(
+      response,
+      "parties",
+      "There was a problem while looking up the selected blueprint: "
+    );
+  }
 
   if (response.data.separate_parties) {
     return [commonInputFields.parties];
@@ -50,24 +82,36 @@ const partiesField = async (z, bundle) => {
   return [];
 };
 
-const flattenFromContext = (context) => {
-  // Given a schema of the shape that comes from the Magistrate API,
-  // flatten it into Zapier inputFields.
-  return [];
-};
-
 const contextField = async (z, bundle) => {
   if (!bundle.inputData.slug) {
-    return [];
+    return [
+      {
+        key: "context",
+        type: "copy",
+        helpText:
+          "You must select a blueprint from the list to set up this integration.",
+      },
+    ];
   }
 
-  // FIXME
   const response = await z.request({
     url:
-      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+      "{{process.env.API_DOMAIN}}/v1/blueprints/" +
+      bundle.inputData.slug +
+      "/?style=zapier",
+    skipThrowForStatus: true,
   });
-  const context = flattenFromContext(response.context);
-  return context;
+
+  if (response.status >= 400) {
+    return errorField(
+      response,
+      "context",
+      "There was a problem while looking up the selected blueprint: "
+    );
+  }
+
+  // FIXME - return response.data.context;
+  return [];
 };
 
 module.exports = {

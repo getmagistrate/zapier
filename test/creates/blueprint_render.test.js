@@ -26,10 +26,9 @@ describe("creates.blueprint_render", () => {
     expect(results).toBeDefined();
     expect(results).toHaveProperty("id");
     expect(results).toHaveProperty("name");
-    // FIXME
-    // expect(results).toHaveProperty("status");
-    // expect(results).toHaveProperty("source");
-    // expect(results["source"]).toEqual("zapier");
+    expect(results).toHaveProperty("status");
+    expect(results).toHaveProperty("source");
+    expect(results["source"]).toEqual("zapier");
   });
 
   it("should generate the blueprintSlugField", async () => {
