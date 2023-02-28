@@ -14,6 +14,8 @@ const unflatten = (obj, skipFirstKey) => {
     const lastKey = keys[keys.length - 1];
     if (Array.isArray(value)) {
       nested[lastKey] = value.map((item) => unflatten(item, true));
+    } else if (lastKey === "_only") {
+      return value;
     } else {
       nested[lastKey] = value;
     }
