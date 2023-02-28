@@ -46,6 +46,20 @@ describe("creates.blueprint_render", () => {
     expect(results[0].choices).toContain("official/safe");
   });
 
+  it("should generate the contextField", async () => {
+    const bundle = { inputData: { slug: "official/safe" } };
+
+    const results = await appTester(
+      App.creates.blueprint_render.operation.inputFields[2],
+      bundle
+    );
+
+    expect(results).toBeDefined();
+    expect(results[0]).toHaveProperty("key");
+    expect(results[0]).toHaveProperty("label");
+    expect(results[0]).toHaveProperty("helpText");
+  });
+
   it("should generate the partiesField with no separate parties", async () => {
     const bundle = { inputData: { slug: "official/safe" } };
 

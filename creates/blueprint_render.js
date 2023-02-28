@@ -1,21 +1,19 @@
 const commonInputFields = require("./commonInputFields");
+const { unflatten } = require("./utils");
 
 const perform = async (z, bundle) => {
+  const body = unflatten(bundle.inputData);
   const response = await z.request({
     method: "POST",
     url:
       "{{process.env.API_DOMAIN}}/v1/envelopes/blueprint/" +
       bundle.inputData.slug +
       "/",
-
-    body: {
-      name: bundle.inputData.name, // FIXME
-    },
+    body,
   });
   // this should return a single object
   return response.data;
 };
-
 
 const errorField = (response, key, preface = "") => {
   if (response.data.detail) {
@@ -96,9 +94,9 @@ const contextField = async (z, bundle) => {
 
   const response = await z.request({
     url:
-      "{{process.env.API_DOMAIN}}/v1/blueprints/" +
-      bundle.inputData.slug +
-      "/?style=zapier",
+      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+    method: "GET",
+    params: { shape: "zapier" },
     skipThrowForStatus: true,
   });
 
@@ -110,8 +108,7 @@ const contextField = async (z, bundle) => {
     );
   }
 
-  // FIXME - return response.data.context;
-  return [];
+  return JSON.parse(response.data.context);
 };
 
 module.exports = {
@@ -140,29 +137,19 @@ module.exports = {
     sample: {
       slug: "official/safe",
       name: "Simple Agreement for Future Equity (SAFE)",
-      context: {
-        details: {
-          purchase_amount: 50000,
-          date: "2022-06-01",
-          governing_law: "CA",
-        },
-        company: {
-          name: "Magistrate Inc.",
-          email: "harry@getmagistrate.com",
-          is_entity: true,
-          state_of_incorporation: "DE",
-          entity_form: "Corporation",
-          authorized_human: {
-            name: "Harry Khanna",
-            title: "Chief Executive Officer",
-          },
-        },
-        investor: {
-          name: "Lisa Vedernikova Khanna",
-          is_entity: false,
-          email: "lisa@getmagistrate.com",
-        },
-      },
+      "context.details.purchase_amount": 50000,
+      "context.details.date": "2022-06-01",
+      "context.details.governing_law": "CA",
+      "context.company.name": "Magistrate Inc.",
+      "context.company.email": "harry@getmagistrate.com",
+      "context.company.is_entity": true,
+      "context.company.state_of_incorporation": "DE",
+      "context.company.entity_form": "Corporation",
+      "context.company.authorized_human.name": "Harry Khanna",
+      "context.company.authorized_human.title": "Chief Executive Officer",
+      "context.investor.name": "Lisa Vedernikova Khanna",
+      "context.investor.is_entity": false,
+      "context.investor.email": "lisa@getmagistrate.com",
       action: "draft",
     },
   },
