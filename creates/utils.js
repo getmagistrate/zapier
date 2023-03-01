@@ -23,6 +23,26 @@ const unflatten = (obj, skipFirstKey) => {
   return result;
 };
 
+const descendsFromOptionalHandler = (fields, bundle) => {
+  const filtered = fields.filter((f) => {
+    if (f.descendsFromOptional !== null) {
+      const optionalObj = bundle.inputData[f.descendsFromOptional];
+      if (optionalObj === false) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // Get rid of the now-unnecessary `descendsFromOptional` key.
+  const pruned = filtered.map((f) => {
+    const { descendsFromOptional, ...rest } = f;
+    return rest;
+  });
+  return pruned;
+};
+
 module.exports = {
   unflatten,
+  descendsFromOptionalHandler,
 };

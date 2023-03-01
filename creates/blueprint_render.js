@@ -1,5 +1,5 @@
 const commonInputFields = require("./commonInputFields");
-const { unflatten } = require("./utils");
+const { unflatten, descendsFromOptionalHandler } = require("./utils");
 
 const perform = async (z, bundle) => {
   const body = unflatten(bundle.inputData);
@@ -108,7 +108,8 @@ const contextField = async (z, bundle) => {
     );
   }
 
-  return JSON.parse(response.data.context);
+  // Check and remove descendants of optional objects that are off before returning.
+  return descendsFromOptionalHandler(JSON.parse(response.data.context), bundle);
 };
 
 module.exports = {

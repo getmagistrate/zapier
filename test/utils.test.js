@@ -1,6 +1,6 @@
 /* globals describe, it, expect */
 
-const { unflatten } = require("../creates/utils");
+const { unflatten, descendsFromOptionalHandler } = require("../creates/utils");
 
 describe("utils", () => {
   it("unflatten handles all the cases", async () => {
@@ -27,5 +27,46 @@ describe("utils", () => {
         i: [7, 8],
       },
     });
+  });
+
+  it("descendsFromOptionalHandler works as expected", async () => {
+    const inputFields = [
+      {
+        key: "a",
+        label: "A",
+        required: true,
+        descendsFromOptional: null,
+      },
+      {
+        key: "b",
+        label: "B",
+        required: false,
+        type: "boolean",
+        descendsFromOptional: null,
+      },
+      {
+        key: "b.c",
+        label: "B.C",
+        required: true,
+        type: "string",
+        descendsFromOptional: "b",
+      },
+    ];
+
+    const expected = inputFields.map((v) => {
+      const { descendsFromOptional, ...rest } = v;
+      return rest;
+    });
+
+    let bundle = { inputData: {} };
+    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(expected);
+
+    bundle = { inputData: { a: "hello", b: true } };
+    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(expected);
+
+    bundle = { inputData: { a: "hello", b: false } };
+    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(
+      expected.slice(0, 2)
+    );
   });
 });
