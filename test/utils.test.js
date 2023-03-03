@@ -168,25 +168,34 @@ describe("utils", () => {
 
   it("removeEmptyObjects works as expected", async () => {
     const rawFields = [
-      { key: "a", type: "boolean", required: true, disallowed: false },
-      { key: "b", type: "object", required: true, disallowed: false },
-      { key: "b.c", type: "string", required: false, disallowed: false },
-      { key: "d", type: "object", required: true, disallowed: false },
-      { key: "d.e", type: "string", required: true, disallowed: false },
+      { key: "context.a", type: "boolean", required: true, disallowed: false },
+      { key: "context.b", type: "object", required: false, disallowed: false },
+      {
+        key: "context.b.c",
+        type: "string",
+        required: false,
+        disallowed: false,
+      },
+      { key: "context.d", type: "object", required: false, disallowed: false },
+      { key: "context.d.e", type: "string", required: true, disallowed: false },
+      { key: "context.f", type: "object", required: true, disallowed: false },
+      { key: "context.f.g", type: "string", required: true, disallowed: false },
     ];
 
     const data = {
-      a: false,
-      b: false,
-      "b.c": "Hello World",
-      d: true,
-      "d.e": "Goodbye World",
+      "context.a": false,
+      "context.b": false,
+      "context.b.c": "Hello World",
+      "context.d": true,
+      "context.d.e": "Goodbye World",
+      "context.f.g": "Deepest midnight",
     };
 
     const result = removeEmptyObjects(data, rawFields);
     expect(result).toEqual({
-      a: false,
-      "d.e": "Goodbye World",
+      "context.a": false,
+      "context.d.e": "Goodbye World",
+      "context.f.g": "Deepest midnight",
     });
   });
 });

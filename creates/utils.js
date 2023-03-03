@@ -140,6 +140,17 @@ const removeEmptyObjects = (data, rawFields) => {
     }
   }
 
+  // 'copy' objects don't show up in the inputData, but they should behave like 'true' objects.
+  // for purposes of deciding whether descendants should be removed.
+  // So add 'copy' objects as 'true' objects.
+  const copyFields = rawFields
+    .map((field) => fieldMap(field, data))
+    .filter(Boolean)
+    .filter((field) => field.key.startsWith("context."))
+    .filter((field) => field.type === "copy")
+    .map((field) => field.key)
+    .forEach((field) => (data[field] = true));
+
   // Remove decendants of objects since removed.
   const processed = {};
 
@@ -156,8 +167,7 @@ const removeEmptyObjects = (data, rawFields) => {
     processed[key] = value;
   }
 
-  // Remove 'true' objects since that's invalid in the data and we've
-  // removed the descendants.
+  // Remove 'true' objects since that's invalid in the data.
   for (const [key, value] of Object.entries(processed)) {
     if (objectFields.includes(key)) {
       delete processed[key];

@@ -71,11 +71,7 @@ const partiesField = async (z, bundle) => {
     return [];
   }
 
-  const response = await z.request({
-    url:
-      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
-    skipThrowForStatus: true,
-  });
+  const response = await fetchBlueprintDetails(z, bundle);
 
   if (response.status >= 400) {
     return errorField(
