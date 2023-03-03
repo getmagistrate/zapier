@@ -77,6 +77,10 @@ const fieldMap = (field, inputData) => {
   // disallowed shouldn't actually appear in the zapier inputField
   delete field.disallowed;
 
+  // HACK: Making all the fields dynamic feels inefficient...
+  // But it would take some hacking to get the list of fields that quality.
+  field.altersDynamicFields = true;
+
   if (field.type == "object") {
     if (field.required) {
       // If the field is an object, if required, make the field

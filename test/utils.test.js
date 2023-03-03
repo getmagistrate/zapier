@@ -106,12 +106,22 @@ describe("utils", () => {
     result = fields.map((field) => fieldMap(field, inputData)).filter(Boolean);
 
     expect(result).toEqual([
-      { key: "a", required: true },
-      { key: "c", required: true },
-      { key: "d", type: "copy", required: false },
-      { key: "f", type: "boolean", required: true },
-      { key: "f.g.h", type: "string", required: false },
-      { key: "f.g.h.i", type: "string", required: false },
+      { key: "a", required: true, altersDynamicFields: true },
+      { key: "c", required: true, altersDynamicFields: true },
+      { key: "d", type: "copy", required: false, altersDynamicFields: true },
+      { key: "f", type: "boolean", required: true, altersDynamicFields: true },
+      {
+        key: "f.g.h",
+        type: "string",
+        required: false,
+        altersDynamicFields: true,
+      },
+      {
+        key: "f.g.h.i",
+        type: "string",
+        required: false,
+        altersDynamicFields: true,
+      },
     ]);
   });
 
