@@ -23,26 +23,44 @@ const unflatten = (obj, skipFirstKey) => {
   return result;
 };
 
-const descendsFromOptionalHandler = (fields, bundle) => {
-  const filtered = fields.filter((f) => {
-    if (f.descendsFromOptional !== null) {
-      const optionalObj = bundle.inputData[f.descendsFromOptional];
-      if (optionalObj === false) {
-        return false;
-      }
-    }
-    return true;
-  });
+const evaluateExpr = (expr, inputData) => {
+  let op, args;
 
-  // Get rid of the now-unnecessary `descendsFromOptional` key.
-  const pruned = filtered.map((f) => {
-    const { descendsFromOptional, ...rest } = f;
-    return rest;
-  });
-  return pruned;
+  // Try/catch is for true/false handling since those aren't
+  // in arrays and can't be destructured.
+  try {
+    [op, ...args] = Array.isArray(expr) ? expr : JSON.parse(expr);
+  } catch (error) {
+    op = expr;
+  }
+
+  switch (op) {
+    case true:
+      return true;
+    case false:
+      return false;
+    case "exists":
+      return args[0] in inputData;
+    case "not_exist":
+      return !(args[0] in inputData);
+    case "eq":
+      return inputData[args[0]] == args[1]; // soft equality for '5' == 5, for example.
+    case "ne":
+      return inputData[args[0]] != args[1];
+    case "and":
+      return (
+        evaluateExpr(args[0], inputData) && evaluateExpr(args[1], inputData)
+      );
+    case "or":
+      return (
+        evaluateExpr(args[0], inputData) || evaluateExpr(args[1], inputData)
+      );
+    default:
+      throw new Error("Unrecognized operation " + tokens[0]);
+  }
 };
 
 module.exports = {
   unflatten,
-  descendsFromOptionalHandler,
+  evaluateExpr,
 };

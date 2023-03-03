@@ -1,6 +1,6 @@
 /* globals describe, it, expect */
 
-const { unflatten, descendsFromOptionalHandler } = require("../creates/utils");
+const { unflatten, evaluateExpr } = require("../creates/utils");
 
 describe("utils", () => {
   it("unflatten handles all the cases", async () => {
@@ -29,44 +29,57 @@ describe("utils", () => {
     });
   });
 
-  it("descendsFromOptionalHandler works as expected", async () => {
-    const inputFields = [
-      {
-        key: "a",
-        label: "A",
-        required: true,
-        descendsFromOptional: null,
-      },
-      {
-        key: "b",
-        label: "B",
-        required: false,
-        type: "boolean",
-        descendsFromOptional: null,
-      },
-      {
-        key: "b.c",
-        label: "B.C",
-        required: true,
-        type: "string",
-        descendsFromOptional: "b",
-      },
-    ];
+  it("evaluateExpr works as expected", async () => {
+    let result;
 
-    const expected = inputFields.map((v) => {
-      const { descendsFromOptional, ...rest } = v;
-      return rest;
+    result = evaluateExpr('["exists", "a.b"]', {});
+    expect(result).toBe(false);
+
+    result = evaluateExpr('["exists", "a.b"]', { "a.b": false });
+    expect(result).toBe(true);
+
+    result = evaluateExpr('["not_exist", "a.b"]', {});
+    expect(result).toBe(true);
+
+    result = evaluateExpr('["not_exist", "a.b"]', { "a.b": false });
+    expect(result).toBe(false);
+
+    result = evaluateExpr('["eq", "a.b", 5]', { "a.b": 4 });
+    expect(result).toBe(false);
+
+    result = evaluateExpr('["eq", "a.b", 5]', { "a.b": 5 });
+    expect(result).toBe(true);
+
+    result = evaluateExpr('["ne", "a.b", 5]', { "a.b": 4 });
+    expect(result).toBe(true);
+
+    result = evaluateExpr('["ne", "a.b", 5]', { "a.b": 5 });
+    expect(result).toBe(false);
+
+    result = evaluateExpr('["and", ["exists", "a.b"], ["eq", "a.b", 5]]', {
+      "a.b": 5,
     });
+    expect(result).toBe(true);
 
-    let bundle = { inputData: {} };
-    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(expected);
+    result = evaluateExpr('["and", ["exists", "a.b"], ["eq", "a.b", 5]]', {
+      "a.b": 0,
+    });
+    expect(result).toBe(false);
 
-    bundle = { inputData: { a: "hello", b: true } };
-    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(expected);
+    result = evaluateExpr('["or", ["eq", "a.b", 5], ["eq", "a.c", 6]]', {
+      "a.c": 6,
+      "a.b": 0,
+    });
+    expect(result).toBe(true);
 
-    bundle = { inputData: { a: "hello", b: false } };
-    expect(descendsFromOptionalHandler(inputFields, bundle)).toEqual(
-      expected.slice(0, 2)
-    );
+    result = evaluateExpr('["or", ["eq", "a.b", 5], ["eq", "a.c", 6]]', {
+      "a.b": 0,
+      "a.c": 0,
+    });
+    expect(result).toBe(false);
+
+    result = evaluateExpr('["or", true, false]');
+    expect(result).toBe(true);
+
   });
 });
