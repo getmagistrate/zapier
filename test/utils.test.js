@@ -1,6 +1,12 @@
 /* globals describe, it, expect */
 
-const { unflatten, evaluateExpr, fieldMap } = require("../creates/utils");
+const {
+  unflatten,
+  evaluateExpr,
+  fieldMap,
+  enumerateAncestors,
+  descendantMap,
+} = require("../creates/utils");
 
 describe("utils", () => {
   it("unflatten handles all the cases", async () => {
@@ -91,6 +97,9 @@ describe("utils", () => {
       { key: "d", type: "object", required: true, disallowed: false },
       { key: "e", type: "object", required: false, disallowed: true },
       { key: "f", type: "object", required: false, disallowed: false },
+      { key: "f.g", type: "object", required: false, disallowed: true },
+      { key: "f.g.h", type: "string", required: false, disallowed: false },
+      { key: "f.g.h.i", type: "string", required: false, disallowed: false },
     ];
     const inputData = {};
 
@@ -101,6 +110,48 @@ describe("utils", () => {
       { key: "c", required: true },
       { key: "d", type: "copy", required: false },
       { key: "f", type: "boolean", required: true },
+      { key: "f.g.h", type: "string", required: false },
+      { key: "f.g.h.i", type: "string", required: false },
     ]);
+  });
+
+  it("descendantMap plus Boolean filter works as expected", async () => {
+    const fields = [
+      { key: "a", required: true },
+      { key: "c", required: false },
+      { key: "d", type: "copy", required: false },
+      { key: "f", type: "boolean", required: true },
+      { key: "f.g.h", type: "string", required: false },
+      { key: "f.g.h.i", type: "string", required: false },
+      { key: "j", type: "boolean", required: false },
+      { key: "j.k", type: "string", required: false },
+    ];
+    const inputData = {
+      a: 1,
+      c: 2,
+      f: true,
+      "f.g.h": "Hello",
+      "f.g.h.i": "World",
+      j: false,
+      "j.k": "kipp",
+    };
+    const remainingFieldKeys = fields.map((field) => field.key);
+
+    const result = fields
+      .map((field) => descendantMap(field, inputData, remainingFieldKeys))
+      .filter(Boolean);
+
+    expect(result).toEqual([
+      { key: "a", required: true },
+      { key: "c", required: false },
+      { key: "d", type: "copy", required: false },
+      { key: "f", type: "boolean", required: true },
+      { key: "j", type: "boolean", required: false },
+    ]);
+  });
+
+  it("enumerateAncestors works as expected", async () => {
+    expect(enumerateAncestors("a.b.c")).toEqual(["a", "a.b"]);
+    expect(enumerateAncestors("a")).toEqual([]);
   });
 });

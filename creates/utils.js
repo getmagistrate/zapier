@@ -95,8 +95,45 @@ const fieldMap = (field, inputData) => {
   return field;
 };
 
+const descendantMap = (field, inputData, remainingFieldKeys) => {
+  const ancestors = enumerateAncestors(field.key);
+
+  for (let i = 0; i < ancestors.length; i++) {
+    // If any ancestor of the field is missing, remove the field.
+    if (!remainingFieldKeys.includes(ancestors[i])) {
+      return null;
+    }
+
+    // If any ancestor of the field is equal to `false`, remove the field.
+    // This would be if the boolean object anscestor has been flipped manually to `false`.
+    if (inputData[ancestors[i]] == false) {
+      return null;
+    }
+  }
+  return field;
+};
+
+const enumerateAncestors = (key) => {
+  const parts = key.split(".");
+  const accumulated = [];
+  for (let i = 0; i < parts.length - 1; i++) {
+    let ancestorKey = "";
+    for (let j = 0; j <= i; j++) {
+      ancestorKey = ancestorKey.concat(parts[j]);
+
+      if (j != i) {
+        ancestorKey = ancestorKey.concat(".");
+      }
+    }
+    accumulated.push(ancestorKey);
+  }
+  return accumulated;
+};
+
 module.exports = {
   unflatten,
   evaluateExpr,
   fieldMap,
+  descendantMap,
+  enumerateAncestors,
 };
