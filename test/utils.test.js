@@ -1,6 +1,6 @@
 /* globals describe, it, expect */
 
-const { unflatten, evaluateExpr } = require("../creates/utils");
+const { unflatten, evaluateExpr, fieldMap } = require("../creates/utils");
 
 describe("utils", () => {
   it("unflatten handles all the cases", async () => {
@@ -80,6 +80,22 @@ describe("utils", () => {
 
     result = evaluateExpr('["or", true, false]');
     expect(result).toBe(true);
+  });
 
+  it("fieldMap works as expected", async () => {
+    let result;
+    const fields = [
+      { key: "a", required: true, disallowed: false },
+      { key: "b", required: false, disallowed: true },
+      { key: "c", required: '["ne", "a", 5]', disallowed: '["eq", "a", 5]' },
+    ];
+    const inputData = {};
+
+    result = fields.map((field) => fieldMap(field, inputData)).filter(Boolean);
+
+    expect(result).toEqual([
+      { key: "a", required: true, disallowed: false },
+      { key: "c", required: true, disallowed: false },
+    ]);
   });
 });

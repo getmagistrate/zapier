@@ -60,7 +60,27 @@ const evaluateExpr = (expr, inputData) => {
   }
 };
 
+const fieldMap = (field, inputData) => {
+  if (field.type !== "object") {
+    // If field is not an object:
+
+    // If required, set it to true.
+    field.required = evaluateExpr(field.required, inputData);
+
+    // If disallowed, remove the field.
+    field.disallowed = evaluateExpr(field.disallowed, inputData);
+    if (field.disallowed) {
+      return null;
+    }
+
+    return field;
+  } else {
+    return null;
+  }
+};
+
 module.exports = {
   unflatten,
   evaluateExpr,
+  fieldMap,
 };
