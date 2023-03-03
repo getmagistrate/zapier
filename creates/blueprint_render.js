@@ -41,7 +41,7 @@ const blueprintSlugField = async (z, bundle) => {
     );
   }
 
-  const data = JSON.parse(response.content);
+  const data = z.JSON.parse(response.content);
 
   return [
     {
@@ -108,7 +108,7 @@ const contextField = async (z, bundle) => {
     );
   }
 
-  const fields = JSON.parse(response.data.context)
+  const fields = z.JSON.parse(response.data.context)
     .map((field) => fieldMap(field, bundle.inputData))
     .filter(Boolean);
 
