@@ -1,5 +1,5 @@
 const commonInputFields = require("./commonInputFields");
-const { unflatten } = require("./utils");
+const { unflatten, fieldMap, descendantMap } = require("./utils");
 
 const perform = async (z, bundle) => {
   const body = unflatten(bundle.inputData);
@@ -108,7 +108,15 @@ const contextField = async (z, bundle) => {
     );
   }
 
-  return JSON.parse(response.data.context);
+  const fields = JSON.parse(response.data.context)
+    .map((field) => fieldMap(field, bundle.inputData))
+    .filter(Boolean);
+
+  const remainingFieldKeys = fields.map((field) => field.key);
+
+  return fields
+    .map((field) => descendantMap(field, bundle.inputData, remainingFieldKeys))
+    .filter(Boolean);
 };
 
 module.exports = {

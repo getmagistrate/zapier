@@ -125,7 +125,11 @@ const enumerateAncestors = (key) => {
         ancestorKey = ancestorKey.concat(".");
       }
     }
-    accumulated.push(ancestorKey);
+
+    // Don't treat bare 'context' ancestor as an ancestor.
+    if (ancestorKey !== "context") {
+      accumulated.push(ancestorKey);
+    }
   }
   return accumulated;
 };

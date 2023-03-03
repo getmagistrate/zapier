@@ -47,7 +47,7 @@ describe("creates.blueprint_render", () => {
   });
 
   it("should generate the contextField", async () => {
-    const bundle = { inputData: { slug: "official/safe" } };
+    const bundle = { inputData: blueprint_render.operation.sample };
 
     const results = await appTester(
       App.creates.blueprint_render.operation.inputFields[2],
@@ -85,5 +85,4 @@ describe("creates.blueprint_render", () => {
     expect(results).toHaveLength(1);
     expect(results[0]).toHaveProperty("key");
   });
-
 });
