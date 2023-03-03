@@ -82,20 +82,25 @@ describe("utils", () => {
     expect(result).toBe(true);
   });
 
-  it("fieldMap works as expected", async () => {
+  it("fieldMap plus Boolean filter works as expected", async () => {
     let result;
     const fields = [
       { key: "a", required: true, disallowed: false },
       { key: "b", required: false, disallowed: true },
       { key: "c", required: '["ne", "a", 5]', disallowed: '["eq", "a", 5]' },
+      { key: "d", type: "object", required: true, disallowed: false },
+      { key: "e", type: "object", required: false, disallowed: true },
+      { key: "f", type: "object", required: false, disallowed: false },
     ];
     const inputData = {};
 
     result = fields.map((field) => fieldMap(field, inputData)).filter(Boolean);
 
     expect(result).toEqual([
-      { key: "a", required: true, disallowed: false },
-      { key: "c", required: true, disallowed: false },
+      { key: "a", required: true },
+      { key: "c", required: true },
+      { key: "d", type: "copy", required: false },
+      { key: "f", type: "boolean", required: true },
     ]);
   });
 });

@@ -61,22 +61,38 @@ const evaluateExpr = (expr, inputData) => {
 };
 
 const fieldMap = (field, inputData) => {
-  if (field.type !== "object") {
-    // If field is not an object:
+  // N.B. Processing of an object's descendants, e.g., removing them or adding
+  // copy to them, appears in a different function.
 
-    // If required, set it to true.
-    field.required = evaluateExpr(field.required, inputData);
+  // Resolve required and disallowed into absolute true or false.
+  field.required = evaluateExpr(field.required, inputData);
+  field.disallowed = evaluateExpr(field.disallowed, inputData);
 
-    // If disallowed, remove the field.
-    field.disallowed = evaluateExpr(field.disallowed, inputData);
-    if (field.disallowed) {
-      return null;
-    }
-
-    return field;
-  } else {
+  if (field.disallowed) {
+    // Remove all disallowed fields. If the field is an object,
+    // descendants will be removed in another step.
     return null;
   }
+
+  // disallowed shouldn't actually appear in the zapier inputField
+  delete field.disallowed;
+
+  if (field.type == "object") {
+    if (field.required) {
+      // If the field is an object, if required, make the field
+      // a copy field with the object's copy.
+      // Don't touch descendants.
+      field.type = "copy";
+      field.required = false;
+    } else {
+      // If the object is not required or disallowed,
+      // it presents as a boolean field that the user must provide.
+      field.type = "boolean";
+      field.required = true;
+    }
+  }
+
+  return field;
 };
 
 module.exports = {
