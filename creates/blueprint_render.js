@@ -1,8 +1,20 @@
 const commonInputFields = require("./commonInputFields");
-const { unflatten, fieldMap, descendantMap } = require("./utils");
+const {
+  unflatten,
+  fieldMap,
+  descendantMap,
+  fetchBlueprintDetails,
+  removeEmptyObjects,
+} = require("./utils");
 
 const perform = async (z, bundle) => {
-  const body = unflatten(bundle.inputData);
+  const rawFields = await fetchBlueprintDetails(z, bundle);
+  const prunedData = removeEmptyObjects(
+    bundle.inputData,
+    z.JSON.parse(rawFields.data.context)
+  );
+
+  const body = unflatten(prunedData);
   const response = await z.request({
     method: "POST",
     url:
@@ -92,13 +104,7 @@ const contextField = async (z, bundle) => {
     ];
   }
 
-  const response = await z.request({
-    url:
-      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
-    method: "GET",
-    params: { shape: "zapier" },
-    skipThrowForStatus: true,
-  });
+  const response = await fetchBlueprintDetails(z, bundle);
 
   if (response.status >= 400) {
     return errorField(

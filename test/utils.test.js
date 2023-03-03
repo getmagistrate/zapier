@@ -6,6 +6,7 @@ const {
   fieldMap,
   enumerateAncestors,
   descendantMap,
+  removeEmptyObjects,
 } = require("../creates/utils");
 
 describe("utils", () => {
@@ -163,5 +164,29 @@ describe("utils", () => {
   it("enumerateAncestors works as expected", async () => {
     expect(enumerateAncestors("a.b.c")).toEqual(["a", "a.b"]);
     expect(enumerateAncestors("a")).toEqual([]);
+  });
+
+  it("removeEmptyObjects works as expected", async () => {
+    const rawFields = [
+      { key: "a", type: "boolean", required: true, disallowed: false },
+      { key: "b", type: "object", required: true, disallowed: false },
+      { key: "b.c", type: "string", required: false, disallowed: false },
+      { key: "d", type: "object", required: true, disallowed: false },
+      { key: "d.e", type: "string", required: true, disallowed: false },
+    ];
+
+    const data = {
+      a: false,
+      b: false,
+      "b.c": "Hello World",
+      d: true,
+      "d.e": "Goodbye World",
+    };
+
+    const result = removeEmptyObjects(data, rawFields);
+    expect(result).toEqual({
+      a: false,
+      "d.e": "Goodbye World",
+    });
   });
 });

@@ -23,6 +23,17 @@ const unflatten = (obj, skipFirstKey) => {
   return result;
 };
 
+const fetchBlueprintDetails = async (z, bundle) => {
+  const response = await z.request({
+    url:
+      "{{process.env.API_DOMAIN}}/v1/blueprints/" + bundle.inputData.slug + "/",
+    method: "GET",
+    params: { shape: "zapier" },
+    skipThrowForStatus: true,
+  });
+  return response;
+};
+
 const evaluateExpr = (expr, inputData) => {
   let op, args;
 
@@ -117,6 +128,45 @@ const descendantMap = (field, inputData, remainingFieldKeys) => {
   return field;
 };
 
+const removeEmptyObjects = (data, rawFields) => {
+  const objectFields = rawFields
+    .filter((field) => field.type === "object")
+    .map((field) => field.key);
+
+  // Remove false objects
+  for (const [key, value] of Object.entries(data)) {
+    if (value === false && objectFields.includes(key)) {
+      delete data[key];
+    }
+  }
+
+  // Remove decendants of objects since removed.
+  const processed = {};
+
+  loop1: for (const [key, value] of Object.entries(data)) {
+    const ancestors = enumerateAncestors(key);
+
+    for (let i = 0; i < ancestors.length; i++) {
+      if (!(ancestors[i] in data)) {
+        continue loop1;
+      }
+    }
+
+    // All ancestors present, go ahead and add it.
+    processed[key] = value;
+  }
+
+  // Remove 'true' objects since that's invalid in the data and we've
+  // removed the descendants.
+  for (const [key, value] of Object.entries(processed)) {
+    if (objectFields.includes(key)) {
+      delete processed[key];
+    }
+  }
+
+  return processed;
+};
+
 const enumerateAncestors = (key) => {
   const parts = key.split(".");
   const accumulated = [];
@@ -140,8 +190,10 @@ const enumerateAncestors = (key) => {
 
 module.exports = {
   unflatten,
+  fetchBlueprintDetails,
   evaluateExpr,
   fieldMap,
   descendantMap,
   enumerateAncestors,
+  removeEmptyObjects,
 };

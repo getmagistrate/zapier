@@ -20,7 +20,7 @@ const authentication = {
 
 const addApiKeyToHeader = (request, z, bundle) => {
   if (bundle.authData.apiKey) {
-  request.headers.Authorization = `Token ${bundle.authData.apiKey}`;
+    request.headers.Authorization = `Token ${bundle.authData.apiKey}`;
   }
   return request;
 };
@@ -44,7 +44,7 @@ module.exports = {
   // If you want your creates to show up, you better include it here!
   creates: {
     [createEnvelope.key]: createEnvelope,
-    [createBlueprintRender.key]: createBlueprintRender
+    [createBlueprintRender.key]: createBlueprintRender,
   },
 
   resources: {},
