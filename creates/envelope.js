@@ -22,9 +22,9 @@ module.exports = {
   noun: "Envelope",
 
   display: {
-    label: "Create Envelope",
+    label: "Use Plain Text",
     description:
-      "Creates a new envelope, probably with input from previous steps.",
+      "Pass in the text of a document to creates an envelope and send it for signature.",
   },
 
   operation: {
