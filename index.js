@@ -25,13 +25,19 @@ const addApiKeyToHeader = (request, z, bundle) => {
   return request;
 };
 
+const addHeaders = (request, z, bundle) => {
+  request.headers["content-type"] = "application/json";
+  request.headers["accept"] = "application/json";
+  return request;
+};
+
 module.exports = {
   // This is just shorthand to reference the installed dependencies you have.
   // Zapier will need to know these before we can upload.
   version: require("./package.json").version,
   platformVersion: require("zapier-platform-core").version,
   authentication,
-  beforeRequest: [addApiKeyToHeader],
+  beforeRequest: [addApiKeyToHeader, addHeaders],
 
   // If you want your trigger to show up, you better include it here!
   triggers: {},
