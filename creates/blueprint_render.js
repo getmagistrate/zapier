@@ -157,6 +157,8 @@ module.exports = {
         { "context.services._only": "Electronic signatures" },
         { "context.services._only": "API access" },
       ],
+      "context.services._only":
+        "Custom blueprint generation,Electronic signatures,API access",
       "context.company.name": "Magistrate Inc.",
       "context.company.email": "harry@getmagistrate.com",
       "context.company.is_entity": true,
