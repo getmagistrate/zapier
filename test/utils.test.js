@@ -7,6 +7,7 @@ const {
   enumerateAncestors,
   descendantMap,
   removeEmptyObjects,
+  removeTopLevel_only,
 } = require("../creates/utils");
 
 describe("utils", () => {
@@ -196,6 +197,27 @@ describe("utils", () => {
       "context.a": false,
       "context.d.e": "Goodbye World",
       "context.f.g": "Deepest midnight",
+    });
+  });
+
+  it("removeTopLevel_only works as expected", async () => {
+    const flat = {
+      a: 1,
+      "b.c": 2,
+      "b.d": 3,
+      "b.e.f": 4,
+      g: [{ "g._only": 5 }, { "g._only": 6 }],
+      "h.i": [{ "h.i._only": 7 }, { "h.i._only": 8 }],
+      "h.i._only": "7,8",
+    };
+    const pruned = removeTopLevel_only(flat);
+    expect(pruned).toEqual({
+      a: 1,
+      "b.c": 2,
+      "b.d": 3,
+      "b.e.f": 4,
+      g: [{ "g._only": 5 }, { "g._only": 6 }],
+      "h.i": [{ "h.i._only": 7 }, { "h.i._only": 8 }],
     });
   });
 });

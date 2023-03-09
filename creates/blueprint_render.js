@@ -5,13 +5,13 @@ const {
   descendantMap,
   fetchBlueprintDetails,
   removeEmptyObjects,
+  removeTopLevel_only,
 } = require("./utils");
 
 const perform = async (z, bundle) => {
   const rawFields = await fetchBlueprintDetails(z, bundle);
-  const prunedData = removeEmptyObjects(
-    bundle.inputData,
-    z.JSON.parse(rawFields.data.context)
+  const prunedData = removeTopLevel_only(
+    removeEmptyObjects(bundle.inputData, z.JSON.parse(rawFields.data.context))
   );
 
   const body = unflatten(prunedData);

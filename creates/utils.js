@@ -198,6 +198,17 @@ const enumerateAncestors = (key) => {
   return accumulated;
 };
 
+const removeTopLevel_only = (obj) => {
+  // Zapier line items also include a weird comma separated
+  // version of ._only at the top level. We just need to remove that.
+  for (const key of Object.keys(obj)) {
+    if (key.split(".").slice(-1).pop() === "_only") {
+      delete obj[key];
+    }
+  }
+  return obj;
+};
+
 module.exports = {
   unflatten,
   fetchBlueprintDetails,
@@ -206,4 +217,5 @@ module.exports = {
   descendantMap,
   enumerateAncestors,
   removeEmptyObjects,
+  removeTopLevel_only,
 };
